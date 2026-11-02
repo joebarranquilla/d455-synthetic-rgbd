@@ -108,3 +108,17 @@ All coefficients are heuristics and need calibrating against a real D455.
 .venv/bin/python scripts/make_depth.py --split dev --drop edges    # writes depth_Lfull_minus_edges.npy
 .venv/bin/python scripts/validate_sensor.py --split dev            # outputs/validate/{metrics.json,*.png}
 ```
+
+## Phase 3: classical localisation (`src/d455sim/loc.py`, `configs/loc.yaml`)
+
+Per instance: back-project the masked depth, remove outliers (Open3D), initialise with PCA, refine with trimmed
+point-to-plane ICP against points sampled from the model. Profiles report axis angle, lateral offset and (separately,
+not used for success) along-axis error; brackets use 4 flip hypotheses and a symmetry-aware rotation error.
+Failures are typed (too_few_points, icp_diverged, axis_flip, outlier_dominated, wrong_scale; clustered mode adds
+merged / fragmented / missed). Thresholds are in `loc.yaml`.
+
+```
+.venv/bin/python scripts/run_loc.py --split dev --levels L0 L3                  # oracle masks -> outputs/loc_dev_oracle.csv
+.venv/bin/python scripts/run_loc.py --split dev --levels L0 --mode clustered    # RANSAC + DBSCAN, secondary
+.venv/bin/python scripts/debug_loc.py --scene 0 --instance 2 --level L3         # 3-panel debug PNG
+```

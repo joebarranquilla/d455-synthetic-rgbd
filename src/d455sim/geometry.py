@@ -212,6 +212,10 @@ def symmetries(cls: str, geom_cfg: dict | None = None) -> list[np.ndarray]:
     out = [np.eye(4)]
     if g["bracket_mirror"]:
         out.append(np.diag([1.0, -1.0, 1.0, 1.0]))
+    if g["bracket_leg_swap"]:
+        D = np.eye(4)
+        D[:3, :3] = [[0, 0, 1], [0, -1, 0], [1, 0, 0]]  # proper rotation, det +1
+        out += [D] + ([D @ out[1]] if g["bracket_mirror"] else [])
     return out
 
 

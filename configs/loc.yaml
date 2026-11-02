@@ -1,0 +1,46 @@
+# Classical (no NN) localisation of single instances from depth. Used by src/d455sim/loc.py.
+seed: 0
+min_px: 100                  # skip instances with fewer visible pixels (meta n_visible_px)
+min_points: 50               # fewer points (before or after outlier removal) => too_few_points
+
+sor:                         # statistical outlier removal (Open3D)
+  nb_neighbors: 20
+  std_ratio: 2.0
+
+model:                       # reference point cloud sampled from geometry.py
+  n_points: 4000
+  seed: 0
+  normal_radius_m: 0.008
+  normal_max_nn: 30
+
+icp:                         # trimmed point-to-plane ICP (model fixed, observed points move)
+  iters: 40
+  max_points: 3000           # random subsample (seeded) used for ICP
+  trim_frac: 0.8             # keep this fraction of the closest correspondences
+  max_corr_m: 0.02
+  tol_trans_m: 1.0e-5
+  tol_rot_rad: 1.0e-4
+  fitness_dist_m: 0.004      # a point counts as an inlier if closer than this to the model
+
+profile:
+  n_roll_hyp: 4              # roll about the long axis is unknown: try this many rolls over 90 deg
+  success: {lateral_mm: 5.0, angle_deg: 5.0}   # along-axis error is reported but NOT used (unobservable)
+
+bracket:
+  all_axis_hyp: false        # false = the 4 sign-flip hypotheses only; true = all 24 proper axis permutations/flips
+  success: {centroid_mm: 5.0, rot_deg: 10.0}
+
+failure:                     # classification of unsuccessful instances, see loc.failure_type
+  outlier_removed_frac: 0.5  # outlier_dominated: SOR removed more than this fraction of the points
+  scale_tol: 0.25            # wrong_scale: cloud extent exceeds the model extent by more than this
+  scale_quantile: 0.01       # extent measured between this and (1 - this) quantile
+  flip_angle_deg: 45.0       # axis_flip (profile): axis angle error above this
+
+clustered:                   # secondary mode: no GT masks
+  stride_px: 2               # use every n-th pixel
+  ransac: {dist_m: 0.005, n: 3, iters: 1000}   # table plane
+  dbscan: {eps_m: 0.012, min_points: 15}
+  overlap_min_frac: 0.3      # missed: best cluster covers less than this fraction of the instance pixels
+  merge_frac: 0.2            # merged: another GT instance makes up more than this fraction of the cluster
+  frag_frac: 0.2             # fragmented: a second cluster covers more than this fraction of the instance
+  min_cluster_px: 10         # clusters smaller than this are ignored
