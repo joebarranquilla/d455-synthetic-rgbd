@@ -7,7 +7,7 @@ import numpy as np
 
 from . import geometry as geo
 
-_outputs_enabled = False
+_distance_enabled = False
 
 
 def init(cfg: dict, d455: dict, K: np.ndarray) -> None:
@@ -26,13 +26,14 @@ def render_sample(cfg: dict, d455: dict, K: np.ndarray, T_world_cam_cv: np.ndarr
     bproc.utility.reset_keyframes()
     bproc.camera.add_camera_pose(cv_to_gl(T_world_cam_cv))
 
-    global _outputs_enabled
-    if not _outputs_enabled:
+    # distance output can only be enabled once; the others are re-registered per sample
+    global _distance_enabled
+    if not _distance_enabled:
         bproc.renderer.enable_distance_output(activate_antialiasing=False)
-        bproc.renderer.enable_normals_output()
-        bproc.renderer.enable_segmentation_output(map_by=["inst_id", "class_id"],
-                                                  default_values={"inst_id": 0, "class_id": 0})
-        _outputs_enabled = True
+        _distance_enabled = True
+    bproc.renderer.enable_normals_output()
+    bproc.renderer.enable_segmentation_output(map_by=["inst_id", "class_id"],
+                                              default_values={"inst_id": 0, "class_id": 0})
 
     # geometry pass first: ~1 spp, near-zero pixel filter => no antialiasing on depth/normals/masks
     bproc.renderer.set_denoiser(None)
@@ -44,7 +45,7 @@ def render_sample(cfg: dict, d455: dict, K: np.ndarray, T_world_cam_cv: np.ndarr
     bproc.renderer.set_denoiser(r["denoiser"])
     bpy.context.scene.cycles.filter_width = r["rgb_filter_width_px"]
     rgb = np.asarray(bproc.renderer.render()["colors"][0])
-    rgb = np.clip(np.nan_to_num(rgb)[..., :3] * 255.0 + 0.5, 0, 255).astype(np.uint8)
+    rgb = np.clip(np.nan_to_num(rgb)[..., :3] + 0.5, 0, 255).astype(np.uint8)
 
     dist = np.asarray(g["distance"][0], np.float64)
     depth = geo.dist_to_zdepth(dist, K)

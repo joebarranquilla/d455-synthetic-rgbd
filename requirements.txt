@@ -5,3 +5,4 @@ pyyaml
 open3d
 blenderproc
 pytest
+matplotlib

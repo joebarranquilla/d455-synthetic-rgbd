@@ -57,7 +57,7 @@ def build_scene(cfg: dict, rng: np.random.Generator) -> list[dict]:
         light.set_type("AREA")
         light.set_location([rng.uniform(-1, 1) * lc["xy_spread_m"], rng.uniform(-1, 1) * lc["xy_spread_m"],
                             _u(rng, lc["height_m"])])
-        light.set_rotation_euler([np.pi, 0, 0])  # area light faces -z by default; point at table
+        light.set_rotation_euler([0, 0, 0])  # area light emits along -z (down) by default
         light.blender_obj.data.size = _u(rng, lc["size_m"])
         light.set_energy(_u(rng, lc["energy_w"]))
 
