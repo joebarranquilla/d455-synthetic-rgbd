@@ -1,0 +1,76 @@
+geometry:
+  profile_sizes_m: [0.02, 0.03, 0.04]
+  profile_length_m: [0.10, 0.40]
+  # per nominal size in mm: slot opening, lip thickness, slot depth, T-cavity width, bore diameter (all m)
+  profile_params:
+    "20": {opening: 0.006, lip: 0.0018, depth: 0.006, t_width: 0.007, bore_d: 0.0042}
+    "30": {opening: 0.008, lip: 0.0025, depth: 0.008, t_width: 0.012, bore_d: 0.006}
+    "40": {opening: 0.010, lip: 0.003, depth: 0.011, t_width: 0.016, bore_d: 0.008}
+  circle_segments: 16
+  bracket:
+    leg_m: 0.03
+    width_m: 0.03
+    thickness_m: 0.003
+    hole_d_m: 0.006
+    hole_along_frac: 0.6
+    hole_across_fracs: [0.28, 0.72]
+  symmetry:
+    profile_end_flip: false   # also allow 180 deg about a transverse axis
+    bracket_mirror: true      # mirror about the width mid-plane (y -> -y)
+
+materials:
+  profile: [silver_anodised, black_anodised, brushed_aluminium]
+  bracket: [zinc]
+  types:
+    silver_anodised:   {base_color: [[0.70, 0.78], [0.70, 0.78], [0.70, 0.78]], metallic: [0.8, 1.0], roughness: [0.25, 0.45], anisotropy: [0.0, 0.3]}
+    black_anodised:    {base_color: [[0.02, 0.06], [0.02, 0.06], [0.02, 0.06]], metallic: [0.6, 0.9], roughness: [0.30, 0.55], anisotropy: [0.0, 0.3]}
+    brushed_aluminium: {base_color: [[0.78, 0.86], [0.78, 0.86], [0.80, 0.88]], metallic: [0.9, 1.0], roughness: [0.30, 0.55], anisotropy: [0.5, 0.9]}
+    zinc:              {base_color: [[0.62, 0.70], [0.64, 0.72], [0.66, 0.76]], metallic: [0.9, 1.0], roughness: [0.20, 0.40], anisotropy: [0.0, 0.1]}
+  table: {base_color: [0.35, 0.28, 0.22], roughness: 0.7, metallic: 0.0}
+  bin: {base_color: [0.15, 0.15, 0.17], roughness: 0.6, metallic: 0.0}
+
+classes: {profile: 1, bracket: 2, other: 3}
+
+table: {size_m: [2.0, 2.0, 0.04]}
+bin:
+  size_m: [0.5, 0.4]
+  wall_height_m: 0.06
+  wall_thickness_m: 0.01
+
+parts:
+  count: [4, 12]
+  bracket_prob: 0.35
+  drop_height_m: [0.10, 0.35]
+  keep_margin_m: 0.03
+  mass_kg: 0.2
+  friction: 0.6
+  collision_shape: {profile: CONVEX_HULL, bracket: MESH}
+  sim_time_s: [1.0, 4.0]
+
+lights:
+  count: [1, 3]
+  size_m: [0.2, 0.6]
+  height_m: [0.6, 1.5]
+  xy_spread_m: 0.6
+  energy_w: [40, 200]
+
+world:
+  color: [[0.02, 0.06], [0.02, 0.06], [0.02, 0.06]]
+  strength: 1.0
+
+camera:
+  height_m: [0.45, 0.9]
+  tilt_deg: [0.0, 45.0]
+  yaw_deg: [0.0, 360.0]
+  pos_jitter_m: 0.02
+  target_jitter_m: 0.04
+
+render:
+  compute_device: GPU
+  compute_device_type: null   # null = auto
+  rgb_spp: 32
+  rgb_filter_width_px: 1.5
+  denoiser: INTEL
+  geom_spp: 1
+  geom_filter_width_px: 0.01   # ~no antialiasing for depth/normals/masks
+  invalid_distance_m: 1.0e8

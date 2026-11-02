@@ -1,0 +1,7 @@
+numpy
+opencv-python
+pandas
+pyyaml
+open3d
+blenderproc
+pytest
