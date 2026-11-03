@@ -17,6 +17,7 @@ geometry:
   symmetry:
     profile_end_flip: false   # also allow 180 deg about a transverse axis
     bracket_mirror: true      # mirror about the width mid-plane (y -> -y)
+    bracket_leg_swap: true    # equal legs: 180 deg about the leg diagonal (x<->z, y->-y) maps the bracket onto itself
 
 materials:
   profile: [silver_anodised, black_anodised, brushed_aluminium]
