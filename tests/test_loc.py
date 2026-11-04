@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 
-from d455sim import geometry as geo
-from d455sim import loc
-from d455sim.config import intrinsics, load_config
+from d435sim import geometry as geo
+from d435sim import loc
+from d435sim.config import intrinsics, load_config
 
 CFG = load_config("loc")
 K = intrinsics(load_config("camera"))

@@ -17,8 +17,8 @@ import matplotlib.pyplot as plt  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from d455sim import loc  # noqa: E402
-from d455sim.config import load_config  # noqa: E402
+from d435sim import loc  # noqa: E402
+from d435sim.config import load_config  # noqa: E402
 
 sys.path.insert(0, str(ROOT / "scripts"))
 from run_loc import load_depth  # noqa: E402

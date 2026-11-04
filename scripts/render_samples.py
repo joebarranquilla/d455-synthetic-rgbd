@@ -13,9 +13,9 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from d455sim import render, scene  # noqa: E402
-from d455sim.config import intrinsics, load_config  # noqa: E402
-from d455sim.meta import build_meta, validate_meta  # noqa: E402
+from d435sim import render, scene  # noqa: E402
+from d435sim.config import intrinsics, load_config  # noqa: E402
+from d435sim.meta import build_meta, validate_meta  # noqa: E402
 
 
 def main() -> None:

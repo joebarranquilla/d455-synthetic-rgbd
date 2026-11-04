@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from d455sim.config import load_config  # noqa: E402
+from d435sim.config import load_config  # noqa: E402
 
 CLASSES = ["profile", "bracket", "all"]
 ERR_COLS = {"profile": ["lateral_offset_mm", "axis_angle_deg", "along_axis_err_mm"],

@@ -19,8 +19,8 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from d455sim import loc  # noqa: E402
-from d455sim.config import load_config  # noqa: E402
+from d435sim import loc  # noqa: E402
+from d435sim.config import load_config  # noqa: E402
 
 
 def load_depth(d: Path, level: str) -> np.ndarray:

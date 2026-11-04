@@ -10,8 +10,8 @@ import report_tables as rt  # noqa: E402
 import run_experiment as rx  # noqa: E402
 import run_v2 as v2  # noqa: E402
 import v2_analysis as v2a  # noqa: E402
-from d455sim import sensor  # noqa: E402
-from d455sim.config import load_config  # noqa: E402
+from d435sim import sensor  # noqa: E402
+from d435sim.config import load_config  # noqa: E402
 
 LEVEL = 0.95
 

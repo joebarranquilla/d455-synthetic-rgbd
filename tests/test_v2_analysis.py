@@ -12,8 +12,8 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import v2_analysis  # noqa: E402
-from d455sim import sensor  # noqa: E402
-from d455sim.config import load_config  # noqa: E402
+from d435sim import sensor  # noqa: E402
+from d435sim.config import load_config  # noqa: E402
 
 
 def test_v2_analysis_generates_tables_and_figures(tmp_path):

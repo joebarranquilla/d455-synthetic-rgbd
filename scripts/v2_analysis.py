@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from d455sim.config import intrinsics, load_config  # noqa: E402
+from d435sim.config import intrinsics, load_config  # noqa: E402
 from report_tables import boot_indices, boot_rate, ci, per_scene_counts, rate_with_ci  # noqa: E402
 
 CLASSES = ["all", "profile", "bracket"]

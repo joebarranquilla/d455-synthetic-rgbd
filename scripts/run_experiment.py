@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from d455sim.config import load_config  # noqa: E402
+from d435sim.config import load_config  # noqa: E402
 import make_depth  # noqa: E402
 import run_loc  # noqa: E402
 

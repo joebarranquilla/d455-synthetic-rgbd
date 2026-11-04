@@ -3,8 +3,8 @@ import json
 import numpy as np
 import pytest
 
-from d455sim import geometry as g
-from d455sim.config import intrinsics, load_config
+from d435sim import geometry as g
+from d435sim.config import intrinsics, load_config
 
 SCENE = load_config("scene")
 GEOM = SCENE["geometry"]
@@ -54,7 +54,7 @@ def test_dist_to_zdepth():
 
 
 def test_meta_schema():
-    from d455sim.meta import build_meta, validate_meta
+    from d435sim.meta import build_meta, validate_meta
     K = intrinsics(load_config("camera"))
     obj = {"id": 1, "class": "profile", "dims_m": [0.02, 0.02, 0.2], "T_cam_obj": np.eye(4),
            "material": {"roughness": 0.3, "metallic": 1.0, "anisotropy": 0.1, "type": "silver_anodised"},

@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 import pytest
 
-from d455sim import sensor as s
-from d455sim.config import intrinsics, load_config
+from d435sim import sensor as s
+from d435sim.config import intrinsics, load_config
 
 CFG = s.make_cfg()
 K = intrinsics(CFG["camera"])

@@ -1,4 +1,4 @@
-# Classical (no NN) localisation of single instances from depth. Used by src/d455sim/loc.py.
+# Classical (no NN) localisation of single instances from depth. Used by src/d435sim/loc.py.
 seed: 0
 min_px: 100                  # skip instances with fewer visible pixels (meta n_visible_px)
 min_points: 50               # fewer points (before or after outlier removal) => too_few_points

@@ -7,7 +7,7 @@ frozen_paths:
   - configs/loc.yaml
   - configs/experiment_v2.yaml
   - docs/experiment.md
-  - src/d455sim
+  - src/d435sim
   - scripts/make_depth.py
   - scripts/run_loc.py
   - scripts/report_tables.py

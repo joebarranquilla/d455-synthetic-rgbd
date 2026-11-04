@@ -3,7 +3,6 @@
 Renders aluminium T-slot profiles and L-brackets (Blender/BlenderProc), degrades the ideal depth with a seeded
 D435-inspired sensor model, and evaluates oracle-mask localization. Camera values are in `configs/camera.yaml`
 (datasheet: 1280x720, 87 deg HFOV, 50 mm baseline, 0.3-3 m). Sensor coefficients are assumptions, not calibrated
-to real captures. (The Python package keeps its original name `d455sim`.)
 
 ## Setup
 ```
@@ -36,5 +35,5 @@ git tag -f v1-freeze && git tag -f v2-protocol
 ```
 
 ## Layout
-`configs/` all parameters, `src/d455sim/` library (only `parts.py`, `scene.py`, `render.py` use bpy),
+`configs/` all parameters, `src/d435sim/` library (only `parts.py`, `scene.py`, `render.py` use bpy),
 `scripts/` entry points, `tests/` pytest (no GPU/Blender). `data/` and `outputs/` are never committed.

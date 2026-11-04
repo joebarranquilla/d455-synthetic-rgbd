@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from d455sim import sensor  # noqa: E402
+from d435sim import sensor  # noqa: E402
 
 Z_BINS = np.arange(0.4, 2.01, 0.2)
 EDGE_MAX_PX = 10
