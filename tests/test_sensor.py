@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 import pytest
 
@@ -64,3 +65,51 @@ def test_levels_and_leave_one_out():
     np.testing.assert_array_equal(s.apply_level(z, ctx, CFG, "L0"), z)
     a = s.apply_level(z, ctx, CFG, "L4")
     np.testing.assert_array_equal(a, s.apply_level(z, ctx, CFG, "L4"))
+
+
+def test_v2_config_declares_single_dropout_deviation():
+    frozen = load_config("ladder")
+    v2 = load_config("ladder_v2")
+    assert v2["dropout"]["p_graze"] == 0.30
+    v2["dropout"]["p_graze"] = frozen["dropout"]["p_graze"]
+    assert v2 == frozen
+
+
+def test_edge_component_arms_are_separate_and_reproducible():
+    ctx = make_ctx()
+    depth = np.full((H, W), 1.0, np.float32)
+    depth[:, W // 2:] = 0.5
+    v2 = s.make_cfg("ladder_v2")
+    occlusion = s.apply_effects(depth, ctx, v2, ["edge_occlusion"], 7)
+    np.testing.assert_array_equal(
+        occlusion,
+        s.occlusion_shadow(depth, K, B, v2["edges"]["occlusion"]["tol_rel"]),
+    )
+    a = s.apply_effects(depth, ctx, v2, ["edge_flying"], 7)
+    b = s.apply_effects(depth, ctx, v2, ["edge_flying"], 7)
+    np.testing.assert_array_equal(a, b)
+    fattened = s.apply_effects(depth, ctx, v2, ["edge_fatten"], 7)
+    assert a.shape == depth.shape and fattened.shape == depth.shape
+
+
+def test_edge_bundle_preserves_fixed_seed_result():
+    ctx = make_ctx()
+    depth = np.full((H, W), 1.0, np.float32)
+    depth[:, W // 2:] = 0.5
+
+    z = s.occlusion_shadow(depth, ctx["K"], ctx["baseline"], CFG["edges"]["occlusion"]["tol_rel"])
+    edge = CFG["edges"]
+    disc = s.discontinuity_mask(z, edge["flying"]["grad_thr_m"])
+    out = z.copy()
+    rng = s.effect_rng(CFG, 7, "edges")
+    k = 2 * edge["flying"]["band_px"] + 1
+    band = cv2.dilate(disc.astype(np.uint8), np.ones((k, k), np.uint8)).astype(bool) & (z > 0)
+    lo, hi = s._valid_min(z, k), s._valid_max(z, k)
+    pick = band & (rng.random(z.shape) < edge["flying"]["prob"]) & np.isfinite(lo) & np.isfinite(hi)
+    lo, hi = np.where(pick, lo, 0.0), np.where(pick, hi, 0.0)
+    out = np.where(pick, lo + rng.random(z.shape) * (hi - lo), out)
+    mn = s._valid_min(z, edge["fatten"]["window_px"])
+    fat = disc & np.isfinite(mn) & (z > 0)
+    expected = np.where(fat, np.minimum(out, mn), out).astype(np.float32)
+    actual = s.apply_effects(depth, ctx, CFG, ["edges"], 7)
+    np.testing.assert_array_equal(actual, expected)

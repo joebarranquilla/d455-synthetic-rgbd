@@ -1,19 +1,18 @@
 # Experiment setup
 
-The test-split experiment evaluates classical per-instance localization using the ground-truth instance masks
-(oracle mode). It runs the cumulative sensor levels L0-L4 and leave-one-effect-out variants of L4. The test data
-is generated separately from the development data; development scenes are used for debugging, not tuning against
-test results.
+The primary experiment is the declared v2 protocol in `protocol_v2.md`. It evaluates classical per-instance
+localization using ground-truth instance masks (oracle mode) on the held-out test scenes. Development scenes are
+used for debugging and visual modelling choices, not for estimating test results.
 
 Localization success thresholds are defined in `configs/loc.yaml`: profiles use lateral position and long-axis
-angle, while brackets use centroid and symmetry-aware rotation error. The report script computes confidence
-intervals by resampling scenes and uses shared bootstrap samples when comparing levels. Its tables and plots
-include success rates, error quantiles, level comparisons, leave-one-out results, failure types, and an optional
-gallery of difficult cases.
+angle, while brackets use centroid and symmetry-aware rotation error. The v2 runner computes success and
+continuous-error summaries, paired scene-bootstrap intervals, isolated-effect and noise-scale analyses, L0
+failure summaries, hole statistics, and the declared figures.
 
-The sensor effects are modelled approximations; the experiment describes the behavior of this configuration and
-localization method, not calibrated real-camera performance.
+Run `python scripts/run_v2.py` from the configured project environment. It requires the `v2-protocol` tag and
+refuses to proceed if the frozen paths differ from that tag. It regenerates the declared test depth maps from raw
+renders and produces every v2 table and figure. Do not tune from test results or modify parameters after the
+protocol tag.
 
-The experiment settings are in `configs/experiment.yaml`. Running `scripts/run_experiment.py` requires the
-`v1-freeze` tag and matching frozen configuration/source files. It reuses existing scenes in `data/test/` and
-creates sensor-level depth files there only when they are missing.
+The older `scripts/run_experiment.py` entry point is retained for the v1-freeze experiment. Sensor effects are
+modelled approximations; neither protocol is a calibrated model of real-camera performance.

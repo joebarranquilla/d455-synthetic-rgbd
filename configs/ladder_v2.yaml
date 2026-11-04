@@ -1,0 +1,39 @@
+# Sensor-degradation ladder. All coefficients below are HEURISTIC, calibrate vs real D455.
+seed: 1234   # base seed; per-effect streams are derived from (seed, sample seed, effect name)
+
+# Effects run in this fixed order (noise is applied before quantisation when both are on).
+effect_order: [noise, quant, dropout, edges]
+
+# Cumulative levels. Leave-one-out levels are generated as Lfull_minus_<effect> from `full`.
+levels:
+  L0: []
+  L1: [quant]
+  L2: [quant, noise]
+  L3: [quant, noise, dropout]
+  L4: [quant, noise, dropout, edges]
+full: L4
+
+noise:
+  scale: 1.0            # HEURISTIC, calibrate vs real D455: multiplies subpixel_rms_px from d455.yaml
+
+dropout:                # HEURISTIC, calibrate vs real D455
+  p_base: 0.01          # background hole probability
+  p_graze: 0.30         # extra probability at grazing incidence
+  theta0_deg: 70.0      # grazing sigmoid centre (incidence angle)
+  width_deg: 6.0        # grazing sigmoid width
+  p_spec: 0.20          # extra probability for smooth surfaces seen head-on
+  spec_sigma_deg: 12.0  # width of the specular lobe
+  field_sigma_px: 4.0   # smoothing scale of the random field => hole blob size
+
+edges:                  # HEURISTIC, calibrate vs real D455
+  occlusion:
+    enabled: true
+    tol_rel: 0.02       # a left pixel is visible in the right view if within this relative depth of the z-buffer
+  flying:
+    enabled: true
+    grad_thr_m: 0.05    # depth jump per pixel that counts as a discontinuity
+    band_px: 1          # half-width of the band around a discontinuity (1-2)
+    prob: 0.30          # chance a band pixel becomes a flying pixel
+  fatten:
+    enabled: true
+    window_px: 3        # min-filter window, applied at discontinuities only

@@ -63,6 +63,7 @@ def test_profile_axis_sign_and_along_axis_not_in_success():
 def test_too_few_points():
     res = loc.localize(np.random.default_rng(0).normal(size=(10, 3)) * 0.01 + [0, 0, 0.6], PROFILE, np.eye(4), CFG)
     assert not res["success"] and res["failure_type"] == "too_few_points"
+    assert res["n_valid_points"] == 10
 
 
 @pytest.mark.parametrize("R", [rot([0, 1, 0], 20) @ rot([1, 0, 0], 200),   # legs facing away from the camera

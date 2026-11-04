@@ -1,0 +1,81 @@
+split: test
+required_tag: v2-protocol
+frozen_paths:
+  - configs/d455.yaml
+  - configs/scene.yaml
+  - configs/ladder_v2.yaml
+  - configs/loc.yaml
+  - configs/experiment_v2.yaml
+  - configs/ladder_v2.diff
+  - protocol_v2.md
+  - src/d455sim
+  - scripts/make_depth.py
+  - scripts/run_loc.py
+  - scripts/report_tables.py
+  - scripts/v2_analysis.py
+  - scripts/run_v2.py
+
+levels: [L0, L1, L2, L3, L4]
+loo_effects: [quant, noise, dropout, edges]
+full_level: L4
+isolated_effect_arms: [quant_only, noise_only, dropout_only, edges_only, L4]
+edge_component_arms:
+  occlusion: edge_occlusion
+  flying_pixels: edge_flying
+  foreground_fattening: edge_fatten
+
+noise_scale_arms:
+  "0.5": noise_s0_5
+  "1.0": L2
+  "2.0": noise_s2
+  "4.0": noise_s4
+  "8.0": noise_s8
+noise_scales: [0.5, 1.0, 2.0, 4.0, 8.0]
+
+arms:
+  quant_only: [quant]
+  noise_only: [noise]
+  dropout_only: [dropout]
+  edges_only: [edges]
+  edge_occlusion: [edge_occlusion]
+  edge_flying: [edge_flying]
+  edge_fatten: [edge_fatten]
+  noise_s0_5: [quant, noise]
+  noise_s2: [quant, noise]
+  noise_s4: [quant, noise]
+  noise_s8: [quant, noise]
+
+bootstrap:
+  expected_scenes: 100
+  replicates: 2000
+  confidence: 0.95
+  seed: 0
+continuous_quantiles:
+  median: 0.5
+  p90: 0.9
+
+baseline_bins:
+  mean_depth_m: [0.4, 0.6, 0.8, 1.0, 1.3, 1.7, 6.0]
+  n_valid_points: [0, 200, 500, 1000, 2000, 4000, 1.0e+9]
+
+range_analysis:
+  working_distance_m: [0.45, 0.9]
+  ideal_min_range_m: 0.6
+  near_cutoff_margin_m: 0.1
+  sigma_depths_m: [0.45, 0.9, 4.0]
+  datasheet_reference_depth_m: 4.0
+  profile_lateral_success_mm: 5.0
+  datasheet_error_at_4m_percent: 2.0
+
+figures:
+  hole_levels: [L0, L1, L2, L3, L4]
+  ladder_scene_ids: ["00000"]
+  depth_min_m: 0.4
+  depth_max_m: 1.0
+  absolute_error_max_m: 0.25
+  hole_connectivity: 8
+  invalid_depth_value_m: 0.0
+
+outputs:
+  directory: outputs/v2
+  localization_csv: loc_v2_test.csv

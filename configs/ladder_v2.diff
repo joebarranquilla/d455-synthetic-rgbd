@@ -1,0 +1,10 @@
+--- configs/ladder.yaml at v1-freeze
++++ configs/ladder_v2.yaml
+@@ -21,1 +21,1 @@
+-  p_graze: 0.60
++  p_graze: 0.30
+
+Reason: visually motivated modeling choice after inspecting perturbed dev depth maps;
+the v1 value produced implausibly large/dense holes. It is not calibrated to D455 data.
+This is the sole parameter deviation from v1-freeze. No p_graze sweep or comparison
+is part of v2.

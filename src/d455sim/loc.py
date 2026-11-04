@@ -213,7 +213,7 @@ def localize(P_raw: np.ndarray, spec: dict, T_gt: np.ndarray, cfg: dict) -> dict
     """Full per-instance pipeline on raw back-projected points. Returns one result row (no ids)."""
     t0 = time.perf_counter()
     n_raw = len(P_raw)
-    row = dict(n_points=n_raw, removed_frac=NAN, axis_angle_deg=NAN, lateral_offset_mm=NAN, along_axis_err_mm=NAN,
+    row = dict(n_valid_points=n_raw, n_points=n_raw, removed_frac=NAN, axis_angle_deg=NAN, lateral_offset_mm=NAN, along_axis_err_mm=NAN,
                centroid_err_mm=NAN, rot_err_deg=NAN, success=False, failure_type="too_few_points",
                mean_depth_m=float(P_raw[:, 2].mean()) if n_raw else NAN)
     if n_raw >= cfg["min_points"]:

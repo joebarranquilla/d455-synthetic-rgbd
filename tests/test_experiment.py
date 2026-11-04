@@ -8,6 +8,9 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import report_tables as rt  # noqa: E402
 import run_experiment as rx  # noqa: E402
+import run_v2 as v2  # noqa: E402
+import v2_analysis as v2a  # noqa: E402
+from d455sim import sensor  # noqa: E402
 from d455sim.config import load_config  # noqa: E402
 
 LEVEL = 0.95
@@ -69,3 +72,41 @@ def test_refuses_without_freeze_tag(monkeypatch):
     monkeypatch.setattr(rx, "git", lambda *a: type("R", (), {"stdout": "v1-freeze\n", "returncode": 1})())
     with pytest.raises(SystemExit, match="differ from tag"):
         rx.check_freeze(cfg)
+
+
+def test_v2_runner_checks_the_tag_and_all_frozen_paths(monkeypatch):
+    cfg = load_config("experiment_v2")
+    responses = {
+        ("tag", "--list", "v2-protocol"): ("v2-protocol\n", 0),
+        ("rev-list", "-n", "1", "v2-protocol"): ("1234567890\n", 0),
+        ("diff", "--quiet", "v2-protocol", "--", *cfg["frozen_paths"]): ("", 0),
+        ("status", "--porcelain", "--untracked-files=all", "--", *cfg["frozen_paths"]): ("", 0),
+    }
+
+    def fake_git(*args):
+        stdout, returncode = responses[args]
+        return type("Result", (), {"stdout": stdout, "returncode": returncode})()
+
+    monkeypatch.setattr(v2, "git", fake_git)
+    assert v2.check_protocol(cfg) == "1234567890"
+    responses[("diff", "--quiet", "v2-protocol", "--", *cfg["frozen_paths"])] = ("", 1)
+    with pytest.raises(SystemExit, match="frozen paths differ"):
+        v2.check_protocol(cfg)
+
+
+def test_v2_arm_plan_has_all_declared_conditions():
+    cfg = load_config("experiment_v2")
+    arms = v2._arm_specs(cfg, sensor.make_cfg("ladder_v2"))
+    assert len(arms) == 20
+    assert cfg["noise_scale_arms"]["1.0"] == "L2"
+    assert arms["noise_s8"]["effects"] == ["quant", "noise"]
+    assert arms["noise_s8"]["noise_scale"] == 8.0
+
+
+def test_continuous_bootstrap_uses_shared_scene_resamples():
+    estimate, lower, upper = v2a._bootstrap_quantiles(
+        np.array([1.0, 3.0]), np.array([0, 1]), np.array([[1, 0], [0, 2]]), 0.5, 1.0
+    )
+    assert estimate == pytest.approx(2.0)
+    assert lower == pytest.approx(1.0)
+    assert upper == pytest.approx(3.0)

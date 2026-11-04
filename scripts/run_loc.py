@@ -55,7 +55,8 @@ def process_scene(args: tuple) -> list[dict]:
     return rows
 
 
-COLUMNS = ["scene", "level", "instance", "class", "material", "mode", "mean_depth_m", "n_visible_px", "n_points",
+COLUMNS = ["scene", "level", "instance", "class", "material", "mode", "mean_depth_m", "n_visible_px",
+           "n_valid_points", "n_points",
            "removed_frac", "axis_angle_deg", "lateral_offset_mm", "along_axis_err_mm", "centroid_err_mm",
            "rot_err_deg", "success", "failure_type", "runtime_ms"]
 
