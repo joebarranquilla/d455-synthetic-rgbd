@@ -42,3 +42,7 @@ No spatially correlated-noise variant is included. No other p_graze value is eva
 - Working-distance analysis uses `0.45--0.9 m`, D455 ideal minimum `0.6 m`, the configured `0.4 m` cutoff, and a `0.10 m` near-cutoff band. It reports `sigma_z` at `0.45`, `0.9`, and `4.0 m`, the configured `5 mm` localization position threshold, and the datasheet's `<2%` error figure at `4 m`.
 
 The single reproduction entry point is `python scripts/run_v2.py`; it verifies the v2 tag/config and regenerates all declared tables and figures from raw test renders. Test-derived outputs are not inputs to parameter selection.
+
+## Post-run analysis-label correction (`v2-protocol-r1`)
+
+After the primary run, the range-statistics CSV key was found to label the near-cutoff window as `0.05 m`, although the predeclared config uses a `0.10 m` margin. The reported `11.1%` was the correct intersection of `[0.4, 0.5] m` with the `[0.45, 0.9] m` working interval, but its label was wrong. The r1 analysis corrects the key and explicitly intersects the band with the working interval. No sensor/localization parameter, arm, threshold, or test-based choice changed; the experiment was rerun under the corrected tag.

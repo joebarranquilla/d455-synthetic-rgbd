@@ -5,6 +5,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pandas as pd
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -71,3 +72,18 @@ def test_v2_analysis_generates_tables_and_figures(tmp_path):
                  "hole_statistics_v2.csv", "degradation_ladder_v2.png",
                  "analysis_summary_v2.json"):
         assert (out / name).is_file()
+
+
+def test_range_statistics_reports_the_configured_cutoff_band(tmp_path):
+    config = load_config("experiment_v2")
+    config["range_analysis"]["working_distance_m"] = [0.35, 0.9]
+    d455 = load_config("d455")
+
+    result = v2_analysis.range_and_noise_statistics(
+        [], config, sensor.make_cfg("ladder_v2"), d455, tmp_path
+    )
+
+    metric = "fraction_of_working_distance_within_0.1m_above_0.4m_cutoff"
+    near_cutoff = result[result.metric == metric]
+    assert len(near_cutoff) == 1
+    assert near_cutoff.iloc[0].value == pytest.approx(0.1 / 0.55)

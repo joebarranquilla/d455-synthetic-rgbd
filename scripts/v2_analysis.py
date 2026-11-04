@@ -404,13 +404,15 @@ def range_and_noise_statistics(scenes: list[Path], experiment_config: dict, ladd
     near_margin = experiment_config["range_analysis"]["near_cutoff_margin_m"]
     working_span = working_max - working_min
     below_ideal_span = max(0.0, min(ideal_min, working_max) - working_min)
-    near_cutoff_span = max(0.0, min(cutoff + near_margin, working_max) - working_min)
+    near_cutoff_span = max(
+        0.0, min(cutoff + near_margin, working_max) - max(cutoff, working_min)
+    )
     fx = intrinsics(d455)[0, 0]
     disparity_sigma = float(d455["subpixel_rms_px"] * ladder_config["noise"]["scale"])
     values = [
         {"metric": "fraction_of_working_distance_below_0.6m_ideal_minimum",
          "value": below_ideal_span / working_span, "unit": "fraction"},
-        {"metric": "fraction_of_working_distance_within_0.05m_above_0.4m_cutoff",
+        {"metric": f"fraction_of_working_distance_within_{near_margin:g}m_above_{cutoff:g}m_cutoff",
          "value": near_cutoff_span / working_span, "unit": "fraction"},
         {"metric": "valid_raw_test_pixels_below_0.6m",
          "value": below_ideal / total_valid if total_valid else np.nan, "unit": "fraction"},

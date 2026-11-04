@@ -1,5 +1,5 @@
 split: test
-required_tag: v2-protocol
+required_tag: v2-protocol-r1
 frozen_paths:
   - configs/d455.yaml
   - configs/scene.yaml
