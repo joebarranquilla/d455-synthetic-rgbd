@@ -1,6 +1,6 @@
 """Write degraded depth maps from raw renders.
 
-CLI: make_depth.py --split S (--level L3 | --drop edges) [--config ladder_v2]
+CLI: make_depth.py --split S (--level L3 | --drop edges)
      [--data DIR] [--workers N]
 
 Output: <sample>/depth_<NAME>.npy (float32, 0 = invalid).

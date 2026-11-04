@@ -1,18 +1,9 @@
-# Experiment setup
+# Experiments
 
-The primary experiment is the declared v2 protocol in `protocol_v2.md`. It evaluates classical per-instance
-localization using ground-truth instance masks (oracle mode) on the held-out test scenes. Development scenes are
-used for debugging and visual modelling choices, not for estimating test results.
+Both run oracle-mask per-instance localization (thresholds in `configs/loc.yaml`) on the 100 test scenes. Dev scenes are
+for debugging only. Parameters: `configs/camera.yaml`, `configs/scene.yaml`, `configs/ladder.yaml`.
 
-Localization success thresholds are defined in `configs/loc.yaml`: profiles use lateral position and long-axis
-angle, while brackets use centroid and symmetry-aware rotation error. The v2 runner computes success and
-continuous-error summaries, paired scene-bootstrap intervals, isolated-effect and noise-scale analyses, L0
-failure summaries, hole statistics, and the declared figures.
-
-Run `python scripts/run_v2.py` from the configured project environment. It requires the `v2-protocol` tag and
-refuses to proceed if the frozen paths differ from that tag. It regenerates the declared test depth maps from raw
-renders and produces every v2 table and figure. Do not tune from test results or modify parameters after the
-protocol tag.
-
-The older `scripts/run_experiment.py` entry point is retained for the v1-freeze experiment. Sensor effects are
-modelled approximations; neither protocol is a calibrated model of real-camera performance.
+- **v1** (`scripts/run_experiment.py`, `configs/experiment.yaml`, tag `v1-freeze`): cumulative levels L0-L4 and
+  leave-one-effect-out. Output `outputs/experiment/`.
+- **v2** (`scripts/run_v2.py`, `configs/experiment_v2.yaml`, tag `v2-protocol`): v1 arms plus isolated effects, edge
+  components, noise-scale sweep, L0 failure types, hole statistics and range analysis. Output `outputs/v2/`.

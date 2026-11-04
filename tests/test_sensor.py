@@ -6,8 +6,8 @@ from d455sim import sensor as s
 from d455sim.config import intrinsics, load_config
 
 CFG = s.make_cfg()
-K = intrinsics(CFG["d455"])
-B = CFG["d455"]["baseline_m"]
+K = intrinsics(CFG["camera"])
+B = CFG["camera"]["baseline_m"]
 H, W = 480, 848
 
 
@@ -20,14 +20,14 @@ def make_ctx(normals=None, inst=None, objects=()):
 
 
 def test_disparity_depth_round_trip_and_quant_bound():
-    z = np.linspace(0.4, 6.0, 1000)
+    z = np.linspace(0.31, 2.9, 1000)
     d = s.depth_to_disp(z, K[0, 0], B)
     np.testing.assert_allclose(s.disp_to_depth(d, K[0, 0], B), z, rtol=1e-12)
     zq = s.quant(z.astype(np.float32).reshape(1, -1), make_ctx(), CFG, np.random.default_rng(0))[0]
     dq = s.depth_to_disp(zq, K[0, 0], B)
     ok = zq > 0
     assert ok.all()
-    assert np.abs(dq - d).max() <= 2.0 ** -CFG["d455"]["disparity_frac_bits"] / 2 * 1.01
+    assert np.abs(dq - d).max() <= 2.0 ** -CFG["camera"]["disparity_frac_bits"] / 2 * 1.01
     assert s.quant(np.full((2, 2), 7.0, np.float32), make_ctx(), CFG, np.random.default_rng(0)).max() == 0
 
 
@@ -35,7 +35,7 @@ def test_disparity_depth_round_trip_and_quant_bound():
 def test_noise_std_matches_analytic(z0):
     z = np.full((300, 300), z0, np.float32)
     out = s.noise(z, make_ctx(), CFG, np.random.default_rng(1))
-    expected = z0 ** 2 * CFG["d455"]["subpixel_rms_px"] * CFG["noise"]["scale"] / (K[0, 0] * B)
+    expected = z0 ** 2 * CFG["camera"]["subpixel_rms_px"] * CFG["noise"]["scale"] / (K[0, 0] * B)
     assert np.std(out - z0) == pytest.approx(expected, rel=0.03)
 
 
@@ -67,19 +67,11 @@ def test_levels_and_leave_one_out():
     np.testing.assert_array_equal(a, s.apply_level(z, ctx, CFG, "L4"))
 
 
-def test_v2_config_declares_single_dropout_deviation():
-    frozen = load_config("ladder")
-    v2 = load_config("ladder_v2")
-    assert v2["dropout"]["p_graze"] == 0.30
-    v2["dropout"]["p_graze"] = frozen["dropout"]["p_graze"]
-    assert v2 == frozen
-
-
 def test_edge_component_arms_are_separate_and_reproducible():
     ctx = make_ctx()
     depth = np.full((H, W), 1.0, np.float32)
     depth[:, W // 2:] = 0.5
-    v2 = s.make_cfg("ladder_v2")
+    v2 = s.make_cfg("ladder")
     occlusion = s.apply_effects(depth, ctx, v2, ["edge_occlusion"], 7)
     np.testing.assert_array_equal(
         occlusion,

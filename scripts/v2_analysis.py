@@ -407,22 +407,23 @@ def range_and_noise_statistics(scenes: list[Path], experiment_config: dict, ladd
     near_cutoff_span = max(
         0.0, min(cutoff + near_margin, working_max) - max(cutoff, working_min)
     )
+    ref_depth = experiment_config["range_analysis"]["datasheet_reference_depth_m"]
     fx = intrinsics(d455)[0, 0]
     disparity_sigma = float(d455["subpixel_rms_px"] * ladder_config["noise"]["scale"])
     values = [
-        {"metric": "fraction_of_working_distance_below_0.6m_ideal_minimum",
+        {"metric": f"fraction_of_working_distance_below_{ideal_min:g}m_ideal_minimum",
          "value": below_ideal_span / working_span, "unit": "fraction"},
         {"metric": f"fraction_of_working_distance_within_{near_margin:g}m_above_{cutoff:g}m_cutoff",
          "value": near_cutoff_span / working_span, "unit": "fraction"},
-        {"metric": "valid_raw_test_pixels_below_0.6m",
+        {"metric": f"valid_raw_test_pixels_below_{ideal_min:g}m",
          "value": below_ideal / total_valid if total_valid else np.nan, "unit": "fraction"},
         {"metric": "valid_raw_test_pixels", "value": total_valid, "unit": "pixels"},
         {"metric": "profile_lateral_success_threshold",
          "value": experiment_config["range_analysis"]["profile_lateral_success_mm"], "unit": "mm"},
         {"metric": "bracket_centroid_success_threshold",
          "value": load_config("loc")["bracket"]["success"]["centroid_mm"], "unit": "mm"},
-        {"metric": "datasheet_error_at_4m",
-         "value": experiment_config["range_analysis"]["datasheet_error_at_4m_percent"], "unit": "percent"},
+        {"metric": f"datasheet_error_at_{ref_depth:g}m",
+         "value": experiment_config["range_analysis"]["datasheet_error_percent"], "unit": "percent"},
     ]
     for depth_m in experiment_config["range_analysis"]["sigma_depths_m"]:
         sigma_z = depth_m ** 2 * disparity_sigma / (fx * d455["baseline_m"])
@@ -430,8 +431,8 @@ def range_and_noise_statistics(scenes: list[Path], experiment_config: dict, ladd
                        "value": sigma_z, "unit": "m"})
         values.append({"metric": f"analytical_sigma_z_at_{depth_m:g}_m",
                        "value": sigma_z * 1000, "unit": "mm"})
-        if depth_m == experiment_config["range_analysis"]["datasheet_reference_depth_m"]:
-            values.append({"metric": "analytical_sigma_z_at_4m_percent_of_range",
+        if depth_m == ref_depth:
+            values.append({"metric": f"analytical_sigma_z_at_{ref_depth:g}m_percent_of_range",
                            "value": sigma_z / depth_m * 100, "unit": "percent"})
     result = pd.DataFrame(values)
     result.to_csv(out / "range_statistics_v2.csv", index=False)
@@ -474,7 +475,7 @@ def generate_all(out: Path, csv_path: Path, experiment_config: dict,
     ladder_figure(scene_dirs, experiment_config["figures"]["ladder_scene_ids"][0],
                   ladder_levels, experiment_config["figures"], out)
     range_stats = range_and_noise_statistics(scene_dirs, experiment_config, ladder_config,
-                                             load_config("d455"), out)
+                                             load_config("camera"), out)
     summary = {
         "scenes": len(scenes),
         "rows": len(df),

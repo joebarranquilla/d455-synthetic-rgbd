@@ -96,7 +96,7 @@ def test_v2_runner_checks_the_tag_and_all_frozen_paths(monkeypatch):
 
 def test_v2_arm_plan_has_all_declared_conditions():
     cfg = load_config("experiment_v2")
-    arms = v2._arm_specs(cfg, sensor.make_cfg("ladder_v2"))
+    arms = v2._arm_specs(cfg, sensor.make_cfg("ladder"))
     assert len(arms) == 20
     assert cfg["noise_scale_arms"]["1.0"] == "L2"
     assert arms["noise_s8"]["effects"] == ["quant", "noise"]

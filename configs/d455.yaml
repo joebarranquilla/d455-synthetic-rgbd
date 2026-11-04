@@ -1,9 +1,0 @@
-# VERIFY vs Intel datasheet
-width: 848
-height: 480
-hfov_deg: 87.0
-baseline_m: 0.095
-min_range_m: 0.4
-max_range_m: 6.0
-subpixel_rms_px: 0.08
-disparity_frac_bits: 6

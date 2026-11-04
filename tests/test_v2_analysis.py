@@ -63,7 +63,7 @@ def test_v2_analysis_generates_tables_and_figures(tmp_path):
     out = tmp_path / "analysis"
 
     summary = v2_analysis.generate_all(
-        out, csv_path, config, sensor.make_cfg("ladder_v2"), scenes
+        out, csv_path, config, sensor.make_cfg("ladder"), scenes
     )
 
     assert summary["scenes"] == 2
@@ -76,14 +76,14 @@ def test_v2_analysis_generates_tables_and_figures(tmp_path):
 
 def test_range_statistics_reports_the_configured_cutoff_band(tmp_path):
     config = load_config("experiment_v2")
-    config["range_analysis"]["working_distance_m"] = [0.35, 0.9]
-    d455 = load_config("d455")
+    config["range_analysis"]["working_distance_m"] = [0.2, 0.9]
+    d455 = load_config("camera")
 
     result = v2_analysis.range_and_noise_statistics(
-        [], config, sensor.make_cfg("ladder_v2"), d455, tmp_path
+        [], config, sensor.make_cfg("ladder"), d455, tmp_path
     )
 
-    metric = "fraction_of_working_distance_within_0.1m_above_0.4m_cutoff"
+    metric = "fraction_of_working_distance_within_0.1m_above_0.3m_cutoff"
     near_cutoff = result[result.metric == metric]
     assert len(near_cutoff) == 1
-    assert near_cutoff.iloc[0].value == pytest.approx(0.1 / 0.55)
+    assert near_cutoff.iloc[0].value == pytest.approx(0.1 / 0.7)

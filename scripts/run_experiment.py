@@ -1,10 +1,10 @@
-"""Run the full experiment on the TEST split: all levels L0-L4 plus leave-one-out, oracle-mask localisation.
+"""Run the TEST experiment and generate its tables: cumulative levels plus leave-one-out localization.
 
 python scripts/run_experiment.py [--data DIR] [--n N] [--workers W] [--out CSV]
 
 Refuses to run unless git tag `v1-freeze` exists and the frozen paths (configs, src) are identical to the tag.
-Step 1 writes depth_<LEVEL>.npy per scene (skipped if present), step 2 localises every instance, one CSV row
-per (scene, level, instance). Then run scripts/report_tables.py.
+Creates missing depth_<LEVEL>.npy files, localizes each instance, writes one CSV row per
+(scene, level, instance), then generates the summary tables and plots.
 """
 import argparse
 import subprocess
@@ -71,6 +71,11 @@ def main() -> None:
     df.to_csv(out, index=False)
     print(f"wrote {out} ({len(df)} rows, {time.time() - t0:.0f} s); tag {cfg['required_tag']} = "
           f"{git('rev-list', '-n', '1', cfg['required_tag']).stdout.strip()[:10]}")
+    subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "report_tables.py"),
+         "--csv", str(out), "--data", a.data, "--out", str(out.parent)],
+        check=True,
+    )
 
 
 if __name__ == "__main__":

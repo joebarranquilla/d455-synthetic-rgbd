@@ -112,7 +112,7 @@ def main() -> None:
 
     experiment = load_config("experiment_v2")
     protocol_commit = check_protocol(experiment)
-    ladder = sensor.make_cfg("ladder_v2")
+    ladder = sensor.make_cfg("ladder")
     out = args.out or ROOT / experiment["outputs"]["directory"]
     out.mkdir(parents=True, exist_ok=True)
     scenes = _scene_dirs(args.data, experiment["split"])
@@ -120,7 +120,7 @@ def main() -> None:
     if len(scenes) != expected:
         raise SystemExit(f"REFUSING TO RUN: expected {expected} test scenes, found {len(scenes)}.")
     arms = _arm_specs(experiment, ladder)
-    jobs = [(scene, name, "ladder_v2", spec["effects"], spec["noise_scale"])
+    jobs = [(scene, name, "ladder", spec["effects"], spec["noise_scale"])
             for scene in scenes for name, spec in arms.items()]
 
     started = time.time()

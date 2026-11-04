@@ -1,6 +1,6 @@
-"""D455 depth degradation effects (bpy-free). Each effect: f(depth, ctx, cfg, rng) -> depth, 0 = invalid.
+"""D435 depth degradation effects (bpy-free). Each effect: f(depth, ctx, cfg, rng) -> depth, 0 = invalid.
 
-cfg  = ladder.yaml dict plus cfg["d455"] (see make_cfg).
+cfg  = ladder.yaml dict plus cfg["camera"] (see make_cfg).
 ctx  = {"normals" HxWx3, "inst" HxW, "meta" dict, "K" 3x3, "baseline" m, "bg_roughness"} (see build_ctx).
 """
 from __future__ import annotations
@@ -16,7 +16,7 @@ from .config import load_config
 
 def make_cfg(ladder_name: str = "ladder") -> dict:
     cfg = load_config(ladder_name)
-    cfg["d455"] = load_config("d455")
+    cfg["camera"] = load_config("camera")
     return cfg
 
 
@@ -65,7 +65,7 @@ def discontinuity_mask(z: np.ndarray, thr_m: float) -> np.ndarray:
 
 def quant(depth: np.ndarray, ctx: dict, cfg: dict, rng: np.random.Generator) -> np.ndarray:
     """Round disparity to 2^-frac_bits px and invalidate outside [min_range, max_range]."""
-    fx, B, d455 = ctx["K"][0, 0], ctx["baseline"], cfg["d455"]
+    fx, B, d455 = ctx["K"][0, 0], ctx["baseline"], cfg["camera"]
     step = 2.0 ** -d455["disparity_frac_bits"]
     d = np.round(depth_to_disp(depth, fx, B) / step) * step
     z = disp_to_depth(d, fx, B)
@@ -76,7 +76,7 @@ def quant(depth: np.ndarray, ctx: dict, cfg: dict, rng: np.random.Generator) -> 
 def noise(depth: np.ndarray, ctx: dict, cfg: dict, rng: np.random.Generator) -> np.ndarray:
     """Gaussian noise in the disparity domain => sigma_z = z^2 * sigma_d / (fx * B)."""
     fx, B = ctx["K"][0, 0], ctx["baseline"]
-    sigma = cfg["d455"]["subpixel_rms_px"] * cfg["noise"]["scale"]
+    sigma = cfg["camera"]["subpixel_rms_px"] * cfg["noise"]["scale"]
     d = depth_to_disp(depth, fx, B)
     d = np.where(d > 0, d + rng.normal(0.0, sigma, d.shape), 0.0)
     return disp_to_depth(d, fx, B).astype(np.float32)

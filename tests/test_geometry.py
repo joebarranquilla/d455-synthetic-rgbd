@@ -41,7 +41,7 @@ def test_bracket_mesh_and_symmetry():
 
 
 def test_dist_to_zdepth():
-    K = intrinsics(load_config("d455"))
+    K = intrinsics(load_config("camera"))
     h, w = 480, 848
     z = np.full((h, w), 1.5)
     u, v = np.meshgrid(np.arange(w), np.arange(h))
@@ -55,7 +55,7 @@ def test_dist_to_zdepth():
 
 def test_meta_schema():
     from d455sim.meta import build_meta, validate_meta
-    K = intrinsics(load_config("d455"))
+    K = intrinsics(load_config("camera"))
     obj = {"id": 1, "class": "profile", "dims_m": [0.02, 0.02, 0.2], "T_cam_obj": np.eye(4),
            "material": {"roughness": 0.3, "metallic": 1.0, "anisotropy": 0.1, "type": "silver_anodised"},
            "n_visible_px": 10}

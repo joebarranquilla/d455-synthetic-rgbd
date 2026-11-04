@@ -27,7 +27,7 @@ def main() -> None:
     ap.add_argument("--out", default=str(ROOT / "data"))
     a = ap.parse_args()
 
-    cfg, d455 = load_config("scene"), load_config("d455")
+    cfg, d455 = load_config("scene"), load_config("camera")
     K = intrinsics(d455)
     render.init(cfg, d455, K)
     times = []

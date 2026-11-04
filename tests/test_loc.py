@@ -6,7 +6,7 @@ from d455sim import loc
 from d455sim.config import intrinsics, load_config
 
 CFG = load_config("loc")
-K = intrinsics(load_config("d455"))
+K = intrinsics(load_config("camera"))
 SEED = 3
 NOISE_M = 0.001
 N_DENSE = 30000
