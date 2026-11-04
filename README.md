@@ -113,7 +113,7 @@ All coefficients are heuristics and need calibrating against a real D455.
 
 Per instance: back-project the masked depth, remove outliers (Open3D), initialise with PCA, refine with trimmed
 point-to-plane ICP against points sampled from the model. Profiles report axis angle, lateral offset and (separately,
-not used for success) along-axis error; brackets use 4 flip hypotheses and a symmetry-aware rotation error.
+not used for success) along-axis error; brackets use four flip orientations and a symmetry-aware rotation error.
 Failures are typed (too_few_points, icp_diverged, axis_flip, outlier_dominated, wrong_scale; clustered mode adds
 merged / fragmented / missed). Thresholds are in `loc.yaml`.
 
@@ -122,3 +122,39 @@ merged / fragmented / missed). Thresholds are in `loc.yaml`.
 .venv/bin/python scripts/run_loc.py --split dev --levels L0 --mode clustered    # RANSAC + DBSCAN, secondary
 .venv/bin/python scripts/debug_loc.py --scene 0 --instance 2 --level L3         # 3-panel debug PNG
 ```
+
+## Re-running the experiments
+
+The experiment setup and reported metrics are described in [`docs/experiment.md`](docs/experiment.md). The test split
+is already rendered in `data/test/`; the experiment script checks the `v1-freeze` tag and refuses to run if the
+frozen configuration or source files differ from it. Settings (levels, bootstrap, bins) are in
+`configs/experiment.yaml`.
+
+```
+# Install the dependencies if needed.
+make deps
+
+# Recreate the five development scenes used by the dev diagnostics (requires BlenderProc and a GPU).
+.venv/bin/blenderproc run scripts/render_samples.py --split dev --n 5 --seed 0
+
+# Generate the depth levels used by the development localization runs.
+.venv/bin/python scripts/make_depth.py --split dev --level L2
+.venv/bin/python scripts/make_depth.py --split dev --level L3
+
+# Development-split diagnostics.
+.venv/bin/python scripts/validate_sensor.py --split dev --n 5
+.venv/bin/python scripts/run_loc.py --split dev --levels L0 L2 L3 --mode oracle
+.venv/bin/python scripts/run_loc.py --split dev --levels L0 --mode clustered
+.venv/bin/python scripts/debug_loc.py --scene 0 --instance 2 --level L3
+
+# Full test-split experiment and its tables, plots, and failure gallery.
+.venv/bin/python scripts/run_experiment.py
+.venv/bin/python scripts/report_tables.py
+
+# Optional: remake the montage from the existing sample without replacing outputs/sample/.
+.venv/bin/python scripts/montage.py outputs/sample/dev 5 outputs/montage.png
+```
+
+`run_experiment.py` creates any missing sensor-level depth maps under `data/test/`; it does not rerender or delete
+the test scenes. Do not use `make sample` if you want to keep the current `outputs/sample/`, because that target
+replaces that directory.

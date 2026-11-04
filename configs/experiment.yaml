@@ -1,0 +1,19 @@
+# Settings for scripts/run_experiment.py and scripts/report_tables.py (test split only).
+split: test
+required_tag: v1-freeze
+frozen_paths: [configs/d455.yaml, configs/scene.yaml, configs/ladder.yaml, configs/loc.yaml, src]  # must match the tag
+
+levels: [L0, L1, L2, L3, L4]            # cumulative ladder, in order; each is compared with the previous one
+loo_effects: [quant, noise, dropout, edges]   # leave-one-out: Lfull_minus_<effect>
+full_level: L4
+
+stats:
+  n_boot: 2000
+  seed: 0
+  ci: 0.95
+
+bins:
+  depth_m: [0.4, 0.6, 0.8, 1.0, 1.3, 1.7, 6.0]      # mean instance depth
+  n_points: [0, 200, 500, 1000, 2000, 4000, 1.0e+9]
+
+gallery_k: 8                            # worst instances per level
