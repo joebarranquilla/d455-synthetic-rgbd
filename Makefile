@@ -4,7 +4,7 @@ BP ?= .venv/bin/blenderproc
 BLENDER ?=
 BPFLAGS = $(if $(BLENDER),--custom-blender-path $(BLENDER),)
 
-.PHONY: deps sample test experiment experiment-v2 experiments
+.PHONY: deps sample test experiment
 
 deps:
 	$(PY) -m pip install -r requirements.txt
@@ -19,8 +19,3 @@ test:
 
 experiment:
 	$(PY) scripts/run_experiment.py
-
-experiment-v2:
-	$(PY) scripts/run_v2.py
-
-experiments: experiment experiment-v2

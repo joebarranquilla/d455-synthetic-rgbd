@@ -4,7 +4,7 @@
 - Units SI (m). Depth = float32 z-depth (not ray distance), 0 = invalid. Camera frame: x right, y down, z forward.
 - Modules importing bpy: only render.py, scene.py, parts.py. geometry.py (profile cross-section, bracket mesh
   maths, model point-cloud sampling) must be bpy-free and shared by parts.py and loc.py.
-- Splits: dev (tune/debug) and test (frozen, never used for tuning). Param changes after tag v1-freeze are forbidden.
+- Splits: dev (tune/debug) and test (frozen, never used for tuning). Finalize parameters using dev before running test experiments.
 - Do not read files you don't need or echo file contents. Reply: code, then summary <=5 lines. No questions:
   choose the simplest option, leave `# ASSUMPTION: ...`. No new deps without 1-line justification.
 - Tests: pytest, <10 s, no GPU/Blender. Never commit data/ or outputs/.

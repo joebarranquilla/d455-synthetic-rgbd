@@ -1,4 +1,4 @@
-"""Analysis products for the predeclared v2 synthetic-depth experiment."""
+"""Analysis products for the predeclared synthetic-depth experiment."""
 from __future__ import annotations
 
 import json
@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from d435sim.config import intrinsics, load_config  # noqa: E402
-from report_tables import boot_indices, boot_rate, ci, per_scene_counts, rate_with_ci  # noqa: E402
+from experiment_stats import boot_indices, boot_rate, ci, per_scene_counts, rate_with_ci  # noqa: E402
 
 CLASSES = ["all", "profile", "bracket"]
 ERROR_METRICS = {
@@ -70,7 +70,7 @@ def success_summary(df: pd.DataFrame, arms: list[str], scenes: list[str],
         for cls in CLASSES:
             rows.append({"arm": arm, "class": cls, **_rate(df, arm, cls, scenes, indices, confidence)})
     result = pd.DataFrame(rows)
-    result.to_csv(out / "success_by_arm_v2.csv", index=False)
+    result.to_csv(out / "success_by_arm.csv", index=False)
     fig, ax = plt.subplots(figsize=(13, 5))
     for offset, cls in enumerate(CLASSES):
         selected = result[result["class"] == cls]
@@ -82,7 +82,7 @@ def success_summary(df: pd.DataFrame, arms: list[str], scenes: list[str],
     ax.set(ylabel="success rate", ylim=(0, 1.02), title="Localization success by predeclared arm")
     ax.legend()
     fig.tight_layout()
-    fig.savefig(out / "success_by_arm_v2.png", dpi=150)
+    fig.savefig(out / "success_by_arm.png", dpi=150)
     plt.close(fig)
     return result
 
@@ -107,7 +107,7 @@ def continuous_errors(df: pd.DataFrame, arms: list[str], scenes: list[str], indi
                     rows.append({"arm": arm, "class": cls, "metric": label, "statistic": statistic,
                                  "estimate": estimate, "ci_lo": lower, "ci_hi": upper, "n": len(values)})
     result = pd.DataFrame(rows)
-    result.to_csv(out / "continuous_errors_v2.csv", index=False)
+    result.to_csv(out / "continuous_errors.csv", index=False)
     return result
 
 
@@ -128,7 +128,7 @@ def paired_comparisons(df: pd.DataFrame, levels: list[str], full_level: str, loo
                                 "ci_lo": lower, "ci_hi": upper,
                                 "no_detectable_effect": bool(lower <= 0 <= upper)})
     paired = pd.DataFrame(paired_rows)
-    paired.to_csv(out / "paired_vs_previous_v2.csv", index=False)
+    paired.to_csv(out / "paired_vs_previous.csv", index=False)
 
     loo_rows = []
     for effect in loo_effects:
@@ -146,7 +146,7 @@ def paired_comparisons(df: pd.DataFrame, levels: list[str], full_level: str, loo
                              "ci_lo": lower, "ci_hi": upper,
                              "no_detectable_effect": bool(lower <= 0 <= upper)})
     loo = pd.DataFrame(loo_rows)
-    loo.to_csv(out / "leave_one_out_v2.csv", index=False)
+    loo.to_csv(out / "leave_one_out.csv", index=False)
     return paired, loo
 
 
@@ -185,7 +185,7 @@ def isolated_ablation(df: pd.DataFrame, full_level: str, single_arms: list[str],
         row["success_L4"] = rates[full_level][0]
         rows.append(row)
     result = pd.DataFrame(rows)
-    result.to_csv(out / "isolated_ablation_v2.csv", index=False)
+    result.to_csv(out / "isolated_ablation.csv", index=False)
     return result
 
 
@@ -207,7 +207,7 @@ def noise_sweep(success: pd.DataFrame, errors: pd.DataFrame, scale_arms: dict[st
                     row[f"{metric}_{statistic}_ci_hi"] = selected["ci_hi"].iloc[0]
             rows.append(row)
     result = pd.DataFrame(rows)
-    result.to_csv(out / "noise_sweep_v2.csv", index=False)
+    result.to_csv(out / "noise_sweep.csv", index=False)
     fig, axs = plt.subplots(1, 2, figsize=(10, 4))
     for cls in CLASSES:
         rows_for_class = result[result["class"] == cls].sort_values("noise_scale")
@@ -226,7 +226,7 @@ def noise_sweep(success: pd.DataFrame, errors: pd.DataFrame, scale_arms: dict[st
         ax.legend()
     fig.suptitle("Noise-scale sweep (otherwise L2)")
     fig.tight_layout()
-    fig.savefig(out / "noise_sweep_v2.png", dpi=150)
+    fig.savefig(out / "noise_sweep.png", dpi=150)
     plt.close(fig)
     return result
 
@@ -237,7 +237,7 @@ def edge_component_summary(success: pd.DataFrame, edge_arms: dict[str, str], out
     result = success[success["arm"].isin(edge_arms.values())].copy()
     reverse = {value: key for key, value in edge_arms.items()}
     result["component"] = result["arm"].map(reverse).map(names)
-    result.to_csv(out / "edge_components_v2.csv", index=False)
+    result.to_csv(out / "edge_components.csv", index=False)
     return result
 
 
@@ -263,7 +263,7 @@ def l0_failure_analysis(df: pd.DataFrame, scenes: list[str], indices: np.ndarray
                          "failed_instances": len(failed), "all_instances": len(selected),
                          "fraction_of_failures": count / len(failed) if len(failed) else 0.0})
     failures = pd.DataFrame(rows)
-    failures.to_csv(out / "l0_failure_types_v2.csv", index=False)
+    failures.to_csv(out / "l0_failure_types.csv", index=False)
 
     bin_rows = []
     for column, bins in config["baseline_bins"].items():
@@ -279,7 +279,7 @@ def l0_failure_analysis(df: pd.DataFrame, scenes: list[str], indices: np.ndarray
                 estimate = rate_with_ci(successes, totals, indices, confidence)
                 bin_rows.append({"bin_variable": column, "bin": str(interval), "class": cls, **estimate})
     bins = pd.DataFrame(bin_rows)
-    bins.to_csv(out / "l0_success_by_bins_v2.csv", index=False)
+    bins.to_csv(out / "l0_success_by_bins.csv", index=False)
 
     fig, ax = plt.subplots(figsize=(8, 4))
     pivot = failures[failures["class"].isin(["profile", "bracket"])].pivot(
@@ -288,7 +288,7 @@ def l0_failure_analysis(df: pd.DataFrame, scenes: list[str], indices: np.ndarray
     ax.set(ylabel="failed instances", title="L0 failure categories by class")
     ax.tick_params(axis="x", rotation=25)
     fig.tight_layout()
-    fig.savefig(out / "l0_failure_types_v2.png", dpi=150)
+    fig.savefig(out / "l0_failure_types.png", dpi=150)
     plt.close(fig)
     return failures, bins, baseline
 
@@ -329,7 +329,7 @@ def hole_statistics(scenes: list[Path], levels: list[str], connectivity: int,
                      "hole_size_p99_px": float(np.quantile(areas, 0.99)) if areas.size else np.nan,
                      "hole_size_max_px": float(areas.max()) if areas.size else np.nan})
     result = pd.DataFrame(rows)
-    result.to_csv(out / "hole_statistics_v2.csv", index=False)
+    result.to_csv(out / "hole_statistics.csv", index=False)
 
     fig, axs = plt.subplots(1, 2, figsize=(11, 4))
     for cls in ("all", "profile", "bracket"):
@@ -349,7 +349,7 @@ def hole_statistics(scenes: list[Path], levels: list[str], connectivity: int,
                     transform=axs[1].transAxes)
     axs[1].set(ylabel="connected invalid component area (pixels)", title="Hole-size distribution")
     fig.tight_layout()
-    fig.savefig(out / "hole_statistics_v2.png", dpi=150)
+    fig.savefig(out / "hole_statistics.png", dpi=150)
     plt.close(fig)
     return result
 
@@ -383,8 +383,8 @@ def ladder_figure(scenes: list[Path], scene_id: str, levels: list[str], figure_c
     depth_bar.set_label("z depth (m)")
     error_bar = fig.colorbar(axes[0, 1].images[0], ax=axes[:, 1], fraction=0.025, pad=0.02)
     error_bar.set_label("absolute depth error (m)")
-    fig.suptitle(f"V2 degradation ladder, test scene {scene_id}; shared color limits")
-    fig.savefig(out / "degradation_ladder_v2.png", dpi=150, bbox_inches="tight")
+    fig.suptitle(f"Degradation ladder, test scene {scene_id}; shared color limits")
+    fig.savefig(out / "degradation_ladder.png", dpi=150, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -435,7 +435,7 @@ def range_and_noise_statistics(scenes: list[Path], experiment_config: dict, ladd
             values.append({"metric": f"analytical_sigma_z_at_{ref_depth:g}m_percent_of_range",
                            "value": sigma_z / depth_m * 100, "unit": "percent"})
     result = pd.DataFrame(values)
-    result.to_csv(out / "range_statistics_v2.csv", index=False)
+    result.to_csv(out / "range_statistics.csv", index=False)
     return result
 
 
@@ -490,7 +490,7 @@ def generate_all(out: Path, csv_path: Path, experiment_config: dict,
         "hole_statistics": holes.to_dict(orient="records"),
         "range_statistics": range_stats.to_dict(orient="records"),
     }
-    (out / "analysis_summary_v2.json").write_text(
+    (out / "analysis_summary.json").write_text(
         json.dumps(summary, indent=2, allow_nan=True,
                    default=lambda value: value.item() if isinstance(value, np.generic) else str(value)) + "\n"
     )

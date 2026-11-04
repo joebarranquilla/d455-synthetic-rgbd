@@ -11,13 +11,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-import v2_analysis  # noqa: E402
+import experiment_analysis  # noqa: E402
 from d435sim import sensor  # noqa: E402
 from d435sim.config import load_config  # noqa: E402
 
 
-def test_v2_analysis_generates_tables_and_figures(tmp_path):
-    config = load_config("experiment_v2")
+def test_experiment_analysis_generates_tables_and_figures(tmp_path):
+    config = load_config("experiment")
     arms = list(dict.fromkeys([
         *config["levels"],
         *(f"Lfull_minus_{effect}" for effect in config["loo_effects"]),
@@ -62,24 +62,24 @@ def test_v2_analysis_generates_tables_and_figures(tmp_path):
     pd.DataFrame(rows).to_csv(csv_path, index=False)
     out = tmp_path / "analysis"
 
-    summary = v2_analysis.generate_all(
+    summary = experiment_analysis.generate_all(
         out, csv_path, config, sensor.make_cfg("ladder"), scenes
     )
 
     assert summary["scenes"] == 2
-    for name in ("success_by_arm_v2.csv", "continuous_errors_v2.csv",
-                 "isolated_ablation_v2.csv", "noise_sweep_v2.csv",
-                 "hole_statistics_v2.csv", "degradation_ladder_v2.png",
-                 "analysis_summary_v2.json"):
+    for name in ("success_by_arm.csv", "continuous_errors.csv",
+                 "isolated_ablation.csv", "noise_sweep.csv",
+                 "hole_statistics.csv", "degradation_ladder.png",
+                 "analysis_summary.json"):
         assert (out / name).is_file()
 
 
 def test_range_statistics_reports_the_configured_cutoff_band(tmp_path):
-    config = load_config("experiment_v2")
+    config = load_config("experiment")
     config["range_analysis"]["working_distance_m"] = [0.2, 0.9]
     d455 = load_config("camera")
 
-    result = v2_analysis.range_and_noise_statistics(
+    result = experiment_analysis.range_and_noise_statistics(
         [], config, sensor.make_cfg("ladder"), d455, tmp_path
     )
 
