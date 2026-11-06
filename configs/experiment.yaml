@@ -57,7 +57,7 @@ figures:
   ladder_scene_ids: ["00000"]
   depth_min_m: 0.3
   depth_max_m: 1.0
-  absolute_error_max_m: 0.25
+  absolute_error_max_m: 0.05
   hole_connectivity: 8
   invalid_depth_value_m: 0.0
 
