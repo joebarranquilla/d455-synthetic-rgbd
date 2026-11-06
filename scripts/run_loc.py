@@ -19,8 +19,8 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from d455sim import loc  # noqa: E402
-from d455sim.config import load_config  # noqa: E402
+from d435sim import loc  # noqa: E402
+from d435sim.config import load_config  # noqa: E402
 
 
 def load_depth(d: Path, level: str) -> np.ndarray:
@@ -55,7 +55,8 @@ def process_scene(args: tuple) -> list[dict]:
     return rows
 
 
-COLUMNS = ["scene", "level", "instance", "class", "material", "mode", "mean_depth_m", "n_visible_px", "n_points",
+COLUMNS = ["scene", "level", "instance", "class", "material", "mode", "mean_depth_m", "n_visible_px",
+           "n_valid_points", "n_points",
            "removed_frac", "axis_angle_deg", "lateral_offset_mm", "along_axis_err_mm", "centroid_err_mm",
            "rot_err_deg", "success", "failure_type", "runtime_ms"]
 

@@ -4,11 +4,11 @@ BP ?= .venv/bin/blenderproc
 BLENDER ?=
 BPFLAGS = $(if $(BLENDER),--custom-blender-path $(BLENDER),)
 
-.PHONY: deps sample test
+.PHONY: deps sample test experiment
 
 deps:
 	$(PY) -m pip install -r requirements.txt
-	$(BP) pip install pyyaml $(BPFLAGS)  # BlenderProc bundles opencv-contrib and numpy
+	$(BP) pip install PyYAML==6.0.3 $(BPFLAGS)  # BlenderProc bundles opencv-contrib and numpy
 
 sample:
 	rm -rf outputs/sample && $(BP) run $(BPFLAGS) scripts/render_samples.py --split dev --n 5 --seed 0 --out outputs/sample
@@ -16,3 +16,6 @@ sample:
 
 test:
 	$(PY) -m pytest -q
+
+experiment:
+	$(PY) scripts/run_experiment.py

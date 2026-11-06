@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from d455sim import sensor  # noqa: E402
+from d435sim import sensor  # noqa: E402
 
 Z_BINS = np.arange(0.4, 2.01, 0.2)
 EDGE_MAX_PX = 10
@@ -29,9 +29,9 @@ def analytic_std(z: np.ndarray, fx: float, B: float, effects: list[str], cfg: di
     """sigma_z = z^2 * sigma_d / (fx*B); sigma_d combines noise and uniform quantisation step."""
     var = 0.0
     if "noise" in effects:
-        var += (cfg["d455"]["subpixel_rms_px"] * cfg["noise"]["scale"]) ** 2
+        var += (cfg["camera"]["subpixel_rms_px"] * cfg["noise"]["scale"]) ** 2
     if "quant" in effects:
-        var += (2.0 ** -cfg["d455"]["disparity_frac_bits"]) ** 2 / 12.0
+        var += (2.0 ** -cfg["camera"]["disparity_frac_bits"]) ** 2 / 12.0
     return z ** 2 * np.sqrt(var) / (fx * B)
 
 
@@ -126,7 +126,7 @@ def main() -> None:
     tiles = []
     for n in ["L0", "L1", "L2", "L3", "L4"]:
         z = sensor.apply_level(gt, ctx, cfg, n)
-        g = (255 * np.clip(z / cfg["d455"]["max_range_m"] * 3, 0, 1)).astype(np.uint8)
+        g = (255 * np.clip(z / cfg["camera"]["max_range_m"] * 3, 0, 1)).astype(np.uint8)
         c = cv2.applyColorMap(g, cv2.COLORMAP_TURBO)
         c[z == 0] = 0
         cv2.putText(c, n, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)

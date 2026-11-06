@@ -1,4 +1,4 @@
-# Sensor-degradation ladder. All coefficients below are HEURISTIC, calibrate vs real D455.
+# Sensor-degradation ladder. All coefficients below are HEURISTIC, calibrate vs real D435.
 seed: 1234   # base seed; per-effect streams are derived from (seed, sample seed, effect name)
 
 # Effects run in this fixed order (noise is applied before quantisation when both are on).
@@ -14,18 +14,18 @@ levels:
 full: L4
 
 noise:
-  scale: 1.0            # HEURISTIC, calibrate vs real D455: multiplies subpixel_rms_px from d455.yaml
+  scale: 1.0            # HEURISTIC, calibrate vs real D435: multiplies subpixel_rms_px from camera.yaml
 
-dropout:                # HEURISTIC, calibrate vs real D455
+dropout:                # HEURISTIC, calibrate vs real D435
   p_base: 0.01          # background hole probability
-  p_graze: 0.60         # extra probability at grazing incidence
+  p_graze: 0.30         # extra probability at grazing incidence
   theta0_deg: 70.0      # grazing sigmoid centre (incidence angle)
   width_deg: 6.0        # grazing sigmoid width
   p_spec: 0.20          # extra probability for smooth surfaces seen head-on
   spec_sigma_deg: 12.0  # width of the specular lobe
   field_sigma_px: 4.0   # smoothing scale of the random field => hole blob size
 
-edges:                  # HEURISTIC, calibrate vs real D455
+edges:                  # HEURISTIC, calibrate vs real D435
   occlusion:
     enabled: true
     tol_rel: 0.02       # a left pixel is visible in the right view if within this relative depth of the z-buffer

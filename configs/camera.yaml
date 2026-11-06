@@ -1,0 +1,9 @@
+# Intel RealSense D435 datasheet: 1280x720 max depth, 87 deg HFOV, 50 mm baseline, ideal range 0.3-3 m, <2% error at 2 m
+width: 1280
+height: 720
+hfov_deg: 87.0
+baseline_m: 0.050
+min_range_m: 0.3
+max_range_m: 3.0
+subpixel_rms_px: 0.08
+disparity_frac_bits: 6
