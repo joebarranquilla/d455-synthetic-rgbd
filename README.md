@@ -15,6 +15,21 @@ make test
 # 1. Render the 100 test scenes into data/test (about the slowest step, use 10 for quick testing)
 .venv/bin/blenderproc run scripts/render_samples.py --split test --n 100 --seed 10000
 
+Alternatively, if data is available, upload it to `data/test` before running the experiment. Example:
+```
+data/test/
+  00000/
+    rgb.png
+    depth_gt.npy
+    normals.npy
+    inst.png
+    cls.png
+    meta.json
+  ...
+  00099/
+    ...
+```
+
 # 2. Run the experiment -> outputs/experiment/
 make experiment
 ```
