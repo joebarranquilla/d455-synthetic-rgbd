@@ -3,6 +3,8 @@ import sys
 from pathlib import Path
 
 import cv2
+from matplotlib.figure import Figure
+from matplotlib.ticker import ScalarFormatter
 import numpy as np
 import pandas as pd
 import pytest
@@ -16,8 +18,26 @@ from d435sim import sensor  # noqa: E402
 from d435sim.config import load_config  # noqa: E402
 
 
-def test_experiment_analysis_generates_tables_and_figures(tmp_path):
+def test_experiment_analysis_generates_tables_and_figures(tmp_path, monkeypatch):
     config = load_config("experiment")
+    saved_noise_sweep = []
+    original_savefig = Figure.savefig
+
+    def check_noise_sweep(fig, filename, *args, **kwargs):
+        if Path(filename).name == "noise_sweep.png":
+            fig.canvas.draw()
+            for ax in fig.axes:
+                np.testing.assert_allclose(ax.get_xticks(), config["noise_scales"])
+                assert isinstance(ax.xaxis.get_major_formatter(), ScalarFormatter)
+                assert len(ax.xaxis.get_minorticklocs()) == 0
+                labels = [label for label in ax.get_xticklabels() if label.get_visible()]
+                bounds = [label.get_window_extent(fig.canvas.get_renderer()) for label in labels]
+                assert all(not left.overlaps(right) for left, right in zip(bounds, bounds[1:]))
+            assert len(fig.axes) == 2
+            saved_noise_sweep.append(True)
+        return original_savefig(fig, filename, *args, **kwargs)
+
+    monkeypatch.setattr(Figure, "savefig", check_noise_sweep)
     arms = list(dict.fromkeys([
         *config["levels"],
         *(f"Lfull_minus_{effect}" for effect in config["loo_effects"]),
@@ -67,6 +87,7 @@ def test_experiment_analysis_generates_tables_and_figures(tmp_path):
     )
 
     assert summary["scenes"] == 2
+    assert saved_noise_sweep == [True]
     for name in ("success_by_arm.csv", "continuous_errors.csv",
                  "isolated_ablation.csv", "noise_sweep.csv",
                  "hole_statistics.csv", "degradation_ladder.png",
