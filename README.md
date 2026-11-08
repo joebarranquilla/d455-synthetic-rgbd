@@ -14,6 +14,7 @@ make test
 ```
 # 1. Render the 100 test scenes into data/test (about the slowest step, use 10 for quick testing)
 .venv/bin/blenderproc run scripts/render_samples.py --split test --n 100 --seed 10000
+```
 
 Alternatively, if data is available, upload it to `data/test` before running the experiment. You can download the data with the 100 test scenes and their perturbed depth maps from https://drive.google.com/file/d/1v6pR0lT7Tr5as0Ho0x_2RHpTW8hC5JMt/view?usp=share_link
 
