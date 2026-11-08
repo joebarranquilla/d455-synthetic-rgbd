@@ -1,23 +1,36 @@
-# Synthetic RGB-D Pipeline and Depth Degradation Analysis on Downstream Localization for an Eye-in-Hand D435
+# Synthetic RGB-D for an eye-in-hand RealSense D435
 
 Renders aluminium T-slot profiles and L-brackets (Blender/BlenderProc), degrades the ideal depth with a seeded
 D435-inspired sensor model, and evaluates oracle-mask localization. Camera values are in `configs/camera.yaml`
-(datasheet: 1280x720, 87 deg HFOV, 50 mm baseline, 0.3-3 m). Sensor coefficients are assumptions, not calibrated
+(datasheet: 1280x720, 87 deg HFOV, 50 mm baseline, 0.3-3 m). Sensor coefficients are assumptions, not calibrated.
 
 ## Setup
-```
+
+```bash
 python3 -m venv .venv && make deps
 make test
 ```
 
 ## Run the experiment (needs a GPU for rendering)
-```
+
+```bash
 # 1. Render the 100 test scenes into data/test (about the slowest step, use 10 for quick testing)
 .venv/bin/blenderproc run scripts/render_samples.py --split test --n 100 --seed 10000
 ```
 
 Alternatively, if data is available, upload it to `data/test` before running the experiment. You can download the data with the 100 test scenes and their perturbed depth maps from https://drive.google.com/file/d/1v6pR0lT7Tr5as0Ho0x_2RHpTW8hC5JMt/view?usp=share_link. Then store it in the repo root under `data/test` as shown below.
 
+# 2. Run the experiment; results are saved to outputs/experiment/
+make experiment
+```
+
+Depth levels are cached as `data/test/*/depth_*.npy`; delete them after any config change.
+
+Alternatively, you can download the 100 test scenes and their perturbed depth maps
+[here](https://drive.google.com/file/d/1v6pR0lT7Tr5as0Ho0x_2RHpTW8hC5JMt/view?usp=share_link).
+Place the downloaded data in `data/test` to skip step 1:
+
+```text
 ```
 data/test/
   00000/
@@ -32,14 +45,11 @@ data/test/
     ...
 ```
 
-# 2. Run the experiment -> outputs/experiment/
-make experiment
-```
-Depth levels are cached as `data/test/*/depth_*.npy`; delete them after any config change.
-
-Optional: `make sample` renders 5 dev scenes and a montage (`outputs/montage.png`);
-`scripts/render_samples.py --split dev` is for debugging only. See [docs/experiment.md](docs/experiment.md) for experiment details.
+Optional: `make sample` renders 5 dev scenes and a montage (`outputs/montage.png`).
+Use `scripts/render_samples.py --split dev` for debugging only. See
+[docs/experiment.md](docs/experiment.md) for experiment details.
 
 ## Layout
+
 `configs/` all parameters, `src/d435sim/` library (only `parts.py`, `scene.py`, `render.py` use bpy),
 `scripts/` entry points, `tests/` pytest (no GPU/Blender). `data/` and `outputs/` are never committed.
