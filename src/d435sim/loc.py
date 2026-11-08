@@ -1,23 +1,14 @@
-"""Classical single-instance localisation from depth (Open3D + numpy, no NN, bpy-free).
+"""Estimate and evaluate individual part poses from depth.
 
-Per instance: back-project masked depth, statistical outlier removal, PCA initialisation, trimmed
-point-to-plane ICP against points sampled from geometry.py. Poses are T_cam_obj (model -> camera).
+Masked depth is back-projected, filtered, and aligned to a sampled model using PCA and trimmed ICP.
+Poses are T_cam_obj (model to camera). Profile success uses lateral and axis-angle errors; along-axis
+error is reported but excluded because it is unobservable when the ends are occluded.
 
-Profile (long axis = model z, centred at the origin): the cross-section is 4-fold symmetric and the
-axis sign is irrelevant, so errors are axis_angle_deg (sign-invariant), lateral_offset_mm (centre offset
-perpendicular to the GT axis) and along_axis_err_mm (offset along it). The along-axis position is NOT
-observable when the ends are occluded (the visible part slides freely along the model), so it is only
-reported; success uses lateral + angle only.
+Bracket rotation error accounts for proper rotational symmetries.
+# ASSUMPTION: improper mirror symmetries cannot be matched by a rotation estimate.
 
-Bracket: PCA init with 4 proper flip hypotheses, each refined by ICP; the best fitness wins. Errors are
-centroid_err_mm and rot_err_deg, the minimum over the proper (det +1) symmetries of geometry.symmetries.
-# ASSUMPTION: improper symmetries (the width mirror) cannot be matched by a rotation estimate, so they
-# are skipped in the rotation error; ICP still handles them since the model itself is mirror symmetric.
-
-Failure types (checked in this order for unsuccessful instances):
-too_few_points (no pose), outlier_dominated (SOR removed most points), wrong_scale (cloud larger than
-the model, e.g. mask covers several parts), axis_flip (profile: axis far off; bracket: position right but
-rotation wrong), icp_diverged (everything else). Clustered mode adds merged / fragmented / missed.
+Failures are classified as too few points, outlier dominated, wrong scale, axis flip, or ICP diverged.
+Clustered mode also reports merged, fragmented, and missed instances.
 """
 from __future__ import annotations
 

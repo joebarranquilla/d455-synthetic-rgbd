@@ -1,4 +1,4 @@
-# Synthetic RGB-D for an eye-in-hand RealSense D435
+# Synthetic RGB-D Pipeline and Depth Degradation Analysis on Downstream Localization for an Eye-in-Hand D435
 
 Renders aluminium T-slot profiles and L-brackets (Blender/BlenderProc), degrades the ideal depth with a seeded
 D435-inspired sensor model, and evaluates oracle-mask localization. Camera values are in `configs/camera.yaml`
@@ -14,6 +14,23 @@ make test
 ```
 # 1. Render the 100 test scenes into data/test (about the slowest step, use 10 for quick testing)
 .venv/bin/blenderproc run scripts/render_samples.py --split test --n 100 --seed 10000
+```
+
+Alternatively, if data is available, upload it to `data/test` before running the experiment. You can download the data with the 100 test scenes and their perturbed depth maps from https://drive.google.com/file/d/1v6pR0lT7Tr5as0Ho0x_2RHpTW8hC5JMt/view?usp=share_link. Then store it in the repo root under `data/test` as shown below.
+
+```
+data/test/
+  00000/
+    rgb.png
+    depth_gt.npy
+    normals.npy
+    inst.png
+    cls.png
+    meta.json
+  ...
+  00099/
+    ...
+```
 
 # 2. Run the experiment -> outputs/experiment/
 make experiment

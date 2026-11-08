@@ -12,6 +12,7 @@ import pandas as pd
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+from matplotlib.ticker import ScalarFormatter  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -222,6 +223,9 @@ def noise_sweep(success: pd.DataFrame, errors: pd.DataFrame, scale_arms: dict[st
         axs[1].plot(selected["noise_scale"], selected[f"{metric}_p90"], marker="o", label=cls)
     axs[1].set(xscale="log", xlabel="disparity-noise scale s", ylabel="90th-percentile position error (mm)")
     for ax in axs:
+        ax.set_xticks(sorted(float(scale) for scale in scale_arms))
+        ax.xaxis.set_major_formatter(ScalarFormatter())
+        ax.minorticks_off()
         ax.grid(True, alpha=0.25)
         ax.legend()
     fig.suptitle("Noise-scale sweep (otherwise L2)")
